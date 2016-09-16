@@ -10,9 +10,9 @@ The format of the CSV file is as follow: Usage,	neutral,	happiness,	surprise,	sa
 # Citation
 If you use the new FER label or the sample code or part of it in your research, please cite the below:
 
-@inproceedings{BarsoumICMI2016,  
->title={Training Deep Networks for Facial Expression Recognition with Crowd-Sourced Label Distribution},  
->author={Barsoum, Emad and Zhang, Cha and Canton Ferrer, Cristian and Zhang, Zhengyou},  
->booktitle={ICMI},  
->year={2016}  
-}
+>@inproceedings{BarsoumICMI2016,  
+>>title={Training Deep Networks for Facial Expression Recognition with Crowd-Sourced Label Distribution},  
+>>author={Barsoum, Emad and Zhang, Cha and Canton Ferrer, Cristian and Zhang, Zhengyou},  
+>>booktitle={ICMI},  
+>>year={2016}  
+>}
