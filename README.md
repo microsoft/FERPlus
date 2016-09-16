@@ -15,4 +15,4 @@ If you use the new FER label or the sample code or part of it in your research, 
 &nbsp;&nbsp;&nbsp;&nbsp;author={Barsoum, Emad and Zhang, Cha and Canton Ferrer, Cristian and Zhang, Zhengyou},  
 &nbsp;&nbsp;&nbsp;&nbsp;booktitle={ICMI},  
 &nbsp;&nbsp;&nbsp;&nbsp;year={2016}  
->}
+}
