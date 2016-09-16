@@ -1,7 +1,7 @@
 # FER+
-This is new label for Emotion FER dataset, each image is tagged by 10 taggers, which provide better quality ground truth for still image emotion than the original FER label. Have 10 taggers for each image enable us to create an emotion probability distribution per face so that we can learn a probability or multi-label instead of the conventional majority voting, as described in: https://arxiv.org/abs/1608.01041
+This is new label for Emotion FER dataset. Each image is tagged by 10 crowd-sourced taggers, which provide better quality ground truth for still image emotion than the original FER label. Having 10 taggers for each image enables us to create an emotion probability distribution per face so that we can learn a probability or multi-label instead of the conventional majority voting, as described in: https://arxiv.org/abs/1608.01041
 
-The new label file is named: fer2013new.csv, it contains the same number of rows as the original fer2013.csv label file with the same order. So that you infer which emotion tag belong to which image, because we can't host the actual image content. Here the original FER label: https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data
+The new label file is named: fer2013new.csv, it contains the same number of rows as the original fer2013.csv label file with the same order, so that you infer which emotion tag belong to which image. Since we can't host the actual image content, please find the original FER data set here: https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data
 
 We also provide a simple parsing code in python to demonstrate how to parse the new label and how to convert it to probability distribution (there is multiple way to do it, we show an example). The parsing code is in src/ReadFERPlus.py
 
