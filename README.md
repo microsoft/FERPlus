@@ -1,7 +1,7 @@
 # FER+
 The FER+ annotations provide a set of new labels for the standard Emotion FER dataset. In FER+, each image has been labeled by 10 crowd-sourced taggers, which provide better quality ground truth for still image emotion than the original FER labels. Having 10 taggers for each image enables researchers to estimate an emotion probability distribution per face. This allows constructing algorithms that produce statistical distributions or multi-label outputs instead of the conventional single-label output, as described in: https://arxiv.org/abs/1608.01041
 
-Here there is example of the FER vs FER+ labels extracted from the abovementioned paper (FER top, FER+ bottom):
+Here are some examples of the FER vs FER+ labels extracted from the abovementioned paper (FER top, FER+ bottom):
 ![FER vs FER+ example](https://raw.githubusercontent.com/Microsoft/FERPlus/README_Fixes/FER+vsFER.png)
 
 The new label file is named **_fer2013new.csv_** and contains the same number of rows as the original *fer2013.csv* label file with the same order, so that you infer which emotion tag belong to which image. Since we can't host the actual image content, please find the original FER data set here: https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data
