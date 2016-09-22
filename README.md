@@ -16,6 +16,6 @@ If you use the new FER+ label or the sample code or part of it in your research,
 **@inproceedings{BarsoumICMI2016,  
 &nbsp;&nbsp;&nbsp;&nbsp;title={Training Deep Networks for Facial Expression Recognition with Crowd-Sourced Label Distribution},  
 &nbsp;&nbsp;&nbsp;&nbsp;author={Barsoum, Emad and Zhang, Cha and Canton Ferrer, Cristian and Zhang, Zhengyou},  
-&nbsp;&nbsp;&nbsp;&nbsp;booktitle={ICMI},  
+&nbsp;&nbsp;&nbsp;&nbsp;booktitle={ACM International Conference on Multimodal Interaction (ICMI)},  
 &nbsp;&nbsp;&nbsp;&nbsp;year={2016}  
 }**
