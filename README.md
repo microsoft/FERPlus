@@ -1,4 +1,4 @@
-#s FER+
+# FER+
 The FER+ annotations provide a set of new labels for the standard Emotion FER dataset. In FER+, each image has been labeled by 10 crowd-sourced taggers, which provide better quality ground truth for still image emotion than the original FER labels. Having 10 taggers for each image enables researchers to estimate an emotion probability distribution per face. This allows constructing algorithms that produce statistical distributions or multi-label outputs instead of the conventional single-label output, as described in: https://arxiv.org/abs/1608.01041
 
 Here are some examples of the FER vs FER+ labels extracted from the abovementioned paper (FER top, FER+ bottom):
