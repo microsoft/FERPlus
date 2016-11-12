@@ -214,7 +214,7 @@ class FERPlusReader(object):
                 emotion[np.argmax(emotion_raw)] = maxval 
             else: 
                 emotion = emotion_unknown   # force setting as unknown 
-        elif (mode == 'probability') or (mode == 'crossentropy'):         
+        elif (mode == 'probability') or (mode == 'crossentropy'):
             sum_part = 0
             count = 0
             valid_emotion = True

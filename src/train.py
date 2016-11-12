@@ -40,12 +40,11 @@ def cost_func(training_mode, prediction, target):
     multiple labels exactly the same.
     '''
     train_loss = None
-
     if training_mode == 'majority' or training_mode == 'probability' or training_mode == 'crossentropy': 
         # Cross Entropy.
-        train_loss = ct.reduce_sum(ct.minus(ct.reduce_log_sum(prediction, axis=0), ct.reduce_sum(ct.element_times(target, prediction), axis=0)))
+        train_loss = ct.negate(ct.reduce_sum(ct.element_times(target, ct.log(prediction)), axis=-1))
     elif training_mode == 'multi_target':
-        train_loss = ct.negate(ct.log(ct.reduce_max(ct.element_times(target, prediction), axis=0)))
+        train_loss = ct.negate(ct.log(ct.reduce_max(ct.element_times(target, prediction), axis=-1)))
 
     return train_loss
     
@@ -91,15 +90,17 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
     minibatch_size = 32
 
     # Training config
-    lr_schedule            = model.learning_rate
+    lr_schedule            = [model.learning_rate]*20 + [model.learning_rate / 2.0]*20 + [model.learning_rate / 10.0]
     lr_per_minibatch       = learning_rate_schedule(lr_schedule, epoch_size, UnitType.minibatch)
-    
+    momentum_time_constant = momentum_as_time_constant_schedule(-minibatch_size/np.log(0.9), epoch_size)
+
     # loss and error cost
     train_loss = cost_func(training_mode, pred, label_var)
-    pe         = classification_error(pred, label_var)
+    pe         = classification_error(z, label_var)
 
     # construct the trainer
-    learner = sgd(pred.parameters, lr = lr_per_minibatch)
+    learner = momentum_sgd(z.parameters, lr = lr_per_minibatch, momentum = momentum_time_constant)    
+    #learner = sgd(pred.parameters, lr = lr_per_minibatch)
     trainer = Trainer(z, train_loss, pe, learner)
 
     # Get minibatches of images to train with and perform model training

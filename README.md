@@ -11,6 +11,53 @@ We also provide a simple parsing code in Python to show how to parse the new lab
 
 The format of the CSV file is as follows: usage,	neutral, happiness,	surprise, sadness, anger, disgust, fear, contempt, unknown, NF. Columns "usage" is the same as the original FER label to differentiate between training, public test and private test sets. The other columns are the vote count for each emotion with the addition of unknown and NF (Not a Face).
 
+## Training
+We also provide a training code with implementation for all the training modes (majority, probability, cross entropy and multi-label) described in https://arxiv.org/abs/1608.01041. The training code uses MS Cognitive Toolkit (formerly CNTK) available in: https://github.com/Microsoft/CNTK.
+
+After installing Cognitive Toolkit and downloading the dataset (we will discuss the dataset layout next), you can simply run the following to start the training:
+
+#### For majority voting mode
+```
+python train.py -d <dataset base folder> -m majority
+```
+
+#### For probability mode
+```
+python train.py -d <dataset base folder> -m probability
+```
+
+#### For cross entropy mode
+```
+python train.py -d <dataset base folder> -m crossentropy
+```
+
+#### For multi-target mode
+```
+python train.py -d <dataset base folder> -m multi_target
+```
+
+## FER+ layout for Training
+There is a folder named data that has the following layout:
+
+```
+/data
+  /FER2013Test
+    label.csv
+  /FER2013Train
+    label.csv
+  /FER2013Valid
+    label.csv
+```
+*label.csv* in each folder contains the actual label for each image, the image name is in the following format: ferXXXXXXXX.png, where XXXXXXXX is the row index of the original FER csv file. So here the names of the first few images:
+
+```
+fer0000000.png
+fer0000001.png
+fer0000002.png
+fer0000003.png
+```
+The folders don't contain the actual images, you will need to download them from https://www.kaggle.com/c/challenges-in-representation-learning-facial-expression-recognition-challenge/data, then extract the images from the FER csv file in such a way, that all images corresponding to "Training" go to FER2013Train folder, all images corresponding to "PublicTest" go to FER2013Valid folder and all images corresponding to "PrivateTest" go to FER2013Test folder.
+
 # Citation
 If you use the new FER+ label or the sample code or part of it in your research, please cite the following:
 
