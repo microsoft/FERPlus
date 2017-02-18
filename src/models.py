@@ -7,15 +7,7 @@ import os
 import sys
 import math
 import numpy as np
-
-from cntk.blocks import default_options
-from cntk.layers import Convolution, MaxPooling, AveragePooling, Dropout, BatchNormalization, Dense
-from cntk.models import Sequential, LayerStack
-from cntk.utils import *
-from cntk.initializer import glorot_uniform
-from cntk import Trainer
-from cntk.learner import momentum_sgd, learning_rate_schedule, UnitType, momentum_as_time_constant_schedule
-from cntk.ops import input_variable, constant, parameter, relu
+import cntk as ct
 
 def build_model(num_classes, model_name):
     '''
@@ -56,26 +48,25 @@ class VGG13(object):
         self._model = self._create_model(num_classes)
 
     def _create_model(self, num_classes):
-        with default_options(activation=relu, init=glorot_uniform()):
-            model = Sequential([
-                LayerStack(2, lambda i: [
-                    Convolution((3,3), [64,128][i], pad=True),
-                    Convolution((3,3), [64,128][i], pad=True),
-                    MaxPooling((2,2), strides=(2,2)),
-                    Dropout(0.25)
+        with ct.default_options(activation=ct.relu, init=ct.glorot_uniform()):
+            model = ct.Sequential([
+                ct.For(range(2), lambda i: [
+                    ct.Convolution((3,3), [64,128][i], pad=True),
+                    ct.Convolution((3,3), [64,128][i], pad=True),
+                    ct.MaxPooling((2,2), strides=(2,2)),
+                    ct.Dropout(0.25)
                 ]),
-                LayerStack(2, lambda i: [
-                    Convolution((3,3), [256,256][i], pad=True),
-                    Convolution((3,3), [256,256][i], pad=True),
-                    Convolution((3,3), [256,256][i], pad=True),                
-                    MaxPooling((2,2), strides=(2,2)),
-                    Dropout(0.25)
+                ct.For(range(2), lambda i: [
+                    ct.Convolution((3,3), [256,256][i], pad=True),
+                    ct.Convolution((3,3), [256,256][i], pad=True),
+                    ct.Convolution((3,3), [256,256][i], pad=True),                
+                    ct.MaxPooling((2,2), strides=(2,2)),
+                    ct.Dropout(0.25)
                 ]),            
-                LayerStack(2, lambda : [
-                    Dense(1024),
-                    Dropout(0.5)
+                ct.For(range(2), lambda : [
+                    ct.Dense(1024),
+                    ct.Dropout(0.5)
                 ]),
-                Dense(num_classes, activation=None)
+                ct.Dense(num_classes, activation=None)
             ])
-
         return model

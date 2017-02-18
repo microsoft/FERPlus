@@ -18,7 +18,6 @@ from ferplus import *
 from cntk import Trainer
 from cntk.learner import sgd, momentum_sgd, learning_rate_schedule, UnitType, momentum_as_time_constant_schedule
 from cntk.ops import cross_entropy_with_softmax, classification_error
-from cntk.ops import input_variable, constant, parameter, softmax
 import cntk as ct
 
 emotion_table = {'neutral'  : 0, 
@@ -67,8 +66,8 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
     model       = build_model(num_classes, model_name)
 
     # set the input variables.
-    input_var = input_variable((1, model.input_height, model.input_width), np.float32)
-    label_var = input_variable((num_classes), np.float32)
+    input_var = ct.input_variable((1, model.input_height, model.input_width), np.float32)
+    label_var = ct.input_variable((num_classes), np.float32)
     
     # read FER+ dataset.
     logging.info("Loading data...")
@@ -84,7 +83,7 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
     
     # get the probalistic output of the model.
     z    = model.model(input_var)
-    pred = softmax(z)
+    pred = ct.softmax(z)
     
     epoch_size     = train_data_reader.size()
     minibatch_size = 32
@@ -101,7 +100,7 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
 
     # construct the trainer
     learner = momentum_sgd(z.parameters, lr_schedule, mm_schedule)
-    trainer = Trainer(z, train_loss, pe, learner)
+    trainer = Trainer(z, (train_loss, pe), learner)
 
     # Get minibatches of images to train with and perform model training
     max_val_accuracy    = 0.0
@@ -127,8 +126,8 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
             trainer.train_minibatch({input_var : images, label_var : labels})
 
             # keep track of statistics.
-            training_loss     += get_train_loss(trainer) * current_batch_size
-            training_accuracy += get_train_eval_criterion(trainer) * current_batch_size
+            training_loss     += trainer.previous_minibatch_loss_average * current_batch_size
+            training_accuracy += trainer.previous_minibatch_evaluation_average * current_batch_size
                 
         training_accuracy /= train_data_reader.size()
         training_accuracy = 1.0 - training_accuracy
