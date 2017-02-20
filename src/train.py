@@ -29,6 +29,7 @@ emotion_table = {'neutral'  : 0,
                  'fear'     : 6, 
                  'contempt' : 7}
 
+# List of folders for training, validation and test.
 train_folders = ['FER2013Train']
 valid_folders = ['FER2013Valid'] 
 test_folders  = ['FER2013Test']

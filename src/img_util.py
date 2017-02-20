@@ -7,6 +7,7 @@ import numpy as np
 import random as rnd
 from PIL import Image
 from scipy import ndimage
+from rect_util import Rect
 
 def compute_norm_mat(base_width, base_height): 
     # normalization matrix used in image pre-processing 
@@ -39,7 +40,7 @@ def preproc_img(img, A, A_pinv):
         diff = diff/std
     return diff.reshape(img.shape)
 
-def distort_img(img, out_width, out_height, max_shift, max_scale, max_angle, max_skew, flip=True): 
+def distort_img(img, roi, out_width, out_height, max_shift, max_scale, max_angle, max_skew, flip=True): 
     shift_y = out_height*max_shift*rnd.uniform(-1.0,1.0)
     shift_x = out_width*max_shift*rnd.uniform(-1.0,1.0)
 
@@ -57,21 +58,19 @@ def distort_img(img, out_width, out_height, max_shift, max_scale, max_angle, max
     scale_x = rnd.uniform(1.0, max_scale) 
     if rnd.choice([True, False]): 
         scale_x = 1.0/scale_x 
-    T_im = crop_img(img, out_width, out_height, shift_x, shift_y, scale_x, scale_y, angle, sk_x, sk_y)
+    T_im = crop_img(img, roi, out_width, out_height, shift_x, shift_y, scale_x, scale_y, angle, sk_x, sk_y)
     if flip and rnd.choice([True, False]): 
         T_im = np.fliplr(T_im)
     return T_im
 
-def crop_img(img, crop_width, crop_height, shift_x, shift_y, scale_x, scale_y, angle, skew_x, skew_y): 
-    width, height = img.size
-    center_x = width/2.0
-    center_y = height/2.0    
-    ctr_in = np.array((center_y, center_x))
+def crop_img(img, roi, crop_width, crop_height, shift_x, shift_y, scale_x, scale_y, angle, skew_x, skew_y):
+    # current face center 
+    ctr_in = np.array((roi.center().y, roi.center().x))
     ctr_out = np.array((crop_height/2.0+shift_y, crop_width/2.0+shift_x))
     out_shape = (crop_height, crop_width)
-    s_y = scale_y*(height-1)*1.0/(crop_height-1)
-    s_x = scale_x*(width-1)*1.0/(crop_width-1)
-
+    s_y = scale_y*(roi.height()-1)*1.0/(crop_height-1)
+    s_x = scale_x*(roi.width()-1)*1.0/(crop_width-1)
+    
     # rotation and scale 
     ang = angle*np.pi/180.0 
     transform = np.array([[np.cos(ang), -np.sin(ang)], [np.sin(ang), np.cos(ang)]])

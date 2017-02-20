@@ -12,6 +12,7 @@ import random as rnd
 from collections import namedtuple
 
 from PIL import Image
+from rect_util import Rect
 import img_util as imgu
 import matplotlib.pyplot as plt
 
@@ -124,7 +125,15 @@ class FERPlusReader(object):
         targets = np.empty(shape=(current_batch_size, self.emotion_count), dtype=np.float32)
         for idx in range(self.batch_start, batch_end):
             index = self.indices[idx]
-            distorted_image = imgu.distort_img(self.data[index][1], self.width, self.height, self.max_shift, self.max_scale, self.max_angle, self.max_skew, self.do_flip)
+            distorted_image = imgu.distort_img(self.data[index][1], 
+                                               self.data[index][3], 
+                                               self.width, 
+                                               self.height, 
+                                               self.max_shift, 
+                                               self.max_scale, 
+                                               self.max_angle, 
+                                               self.max_skew, 
+                                               self.do_flip)
             final_image = imgu.preproc_img(distorted_image, A=self.A, A_pinv=self.A_pinv)
 
             inputs[idx-self.batch_start]    = final_image
@@ -152,14 +161,18 @@ class FERPlusReader(object):
                     image_path = os.path.join(folder_path, row[0])
                     image_data = Image.open(image_path)
                     image_data.load()
-                    
+
+                    # face rectangle 
+                    box = list(map(int, row[1][1:-1].split(',')))
+                    face_rc = Rect(box)
+
                     emotion_raw = list(map(float, row[2:len(row)]))
                     emotion = self._process_data(emotion_raw, mode) 
                     idx = np.argmax(emotion)
                     if idx < self.emotion_count: # not unknown or non-face 
                         emotion = emotion[:-2]
                         emotion = [float(i)/sum(emotion) for i in emotion]
-                        self.data.append((image_path, image_data, emotion))
+                        self.data.append((image_path, image_data, emotion, face_rc))
                         self.per_emotion_count[idx] += 1
         
         self.indices = np.arange(len(self.data))
