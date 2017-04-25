@@ -49,25 +49,25 @@ class VGG13(object):
 
     def _create_model(self, num_classes):
         with ct.default_options(activation=ct.relu, init=ct.glorot_uniform()):
-            model = ct.Sequential([
-                ct.For(range(2), lambda i: [
-                    ct.Convolution((3,3), [64,128][i], pad=True, name='conv{}-1'.format(i+1)),
-                    ct.Convolution((3,3), [64,128][i], pad=True, name='conv{}-2'.format(i+1)),
-                    ct.MaxPooling((2,2), strides=(2,2), name='pool{}-1'.format(i+1)),
-                    ct.Dropout(0.25, name='drop{}-1'.format(i+1))
+            model = ct.layers.Sequential([
+                ct.layers.For(range(2), lambda i: [
+                    ct.layers.Convolution((3,3), [64,128][i], pad=True, name='conv{}-1'.format(i+1)),
+                    ct.layers.Convolution((3,3), [64,128][i], pad=True, name='conv{}-2'.format(i+1)),
+                    ct.layers.MaxPooling((2,2), strides=(2,2), name='pool{}-1'.format(i+1)),
+                    ct.layers.Dropout(0.25, name='drop{}-1'.format(i+1))
                 ]),
-                ct.For(range(2), lambda i: [
-                    ct.Convolution((3,3), [256,256][i], pad=True, name='conv{}-1'.format(i+3)),
-                    ct.Convolution((3,3), [256,256][i], pad=True, name='conv{}-2'.format(i+3)),
-                    ct.Convolution((3,3), [256,256][i], pad=True, name='conv{}-3'.format(i+3)),                
-                    ct.MaxPooling((2,2), strides=(2,2), name='pool{}-1'.format(i+3)),
-                    ct.Dropout(0.25, name='drop{}-1'.format(i+3))
+                ct.layers.For(range(2), lambda i: [
+                    ct.layers.Convolution((3,3), [256,256][i], pad=True, name='conv{}-1'.format(i+3)),
+                    ct.layers.Convolution((3,3), [256,256][i], pad=True, name='conv{}-2'.format(i+3)),
+                    ct.layers.Convolution((3,3), [256,256][i], pad=True, name='conv{}-3'.format(i+3)),                
+                    ct.layers.MaxPooling((2,2), strides=(2,2), name='pool{}-1'.format(i+3)),
+                    ct.layers.Dropout(0.25, name='drop{}-1'.format(i+3))
                 ]),            
-                ct.For(range(2), lambda i: [
-                    ct.Dense(1024, activation=None, name='fc{}'.format(i+5)),
-                    ct.Activation(activation=ct.relu, name='relu{}'.format(i+5)),
-                    ct.Dropout(0.5, name='drop{}'.format(i+5))
+                ct.layers.For(range(2), lambda i: [
+                    ct.layers.Dense(1024, activation=None, name='fc{}'.format(i+5)),
+                    ct.layers.Activation(activation=ct.relu, name='relu{}'.format(i+5)),
+                    ct.layers.Dropout(0.5, name='drop{}'.format(i+5))
                 ]),
-                ct.Dense(num_classes, activation=None, name='output')
+                ct.layers.Dense(num_classes, activation=None, name='output')
             ])
         return model
