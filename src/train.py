@@ -17,18 +17,18 @@ from ferplus import *
 
 import cntk as ct
 
-emotion_table = {'neutral'  : 0, 
-                 'happiness': 1, 
-                 'surprise' : 2, 
-                 'sadness'  : 3, 
-                 'anger'    : 4, 
-                 'disgust'  : 5, 
-                 'fear'     : 6, 
+emotion_table = {'neutral'  : 0,
+                 'happiness': 1,
+                 'surprise' : 2,
+                 'sadness'  : 3,
+                 'anger'    : 4,
+                 'disgust'  : 5,
+                 'fear'     : 6,
                  'contempt' : 7}
 
 # List of folders for training, validation and test.
 train_folders = ['FER2013Train']
-valid_folders = ['FER2013Valid'] 
+valid_folders = ['FER2013Valid']
 test_folders  = ['FER2013Test']
 
 def cost_func(training_mode, prediction, target):
@@ -37,14 +37,14 @@ def cost_func(training_mode, prediction, target):
     multiple labels exactly the same.
     '''
     train_loss = None
-    if training_mode == 'majority' or training_mode == 'probability' or training_mode == 'crossentropy': 
+    if training_mode == 'majority' or training_mode == 'probability' or training_mode == 'crossentropy':
         # Cross Entropy.
         train_loss = ct.negate(ct.reduce_sum(ct.element_times(target, ct.log(prediction)), axis=-1))
     elif training_mode == 'multi_target':
         train_loss = ct.negate(ct.log(ct.reduce_max(ct.element_times(target, prediction), axis=-1)))
 
     return train_loss
-    
+
 def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs = 100):
 
     # create needed folders.
@@ -53,7 +53,7 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
     if not os.path.exists(output_model_folder):
         os.makedirs(output_model_folder)
 
-    # creating logging file 
+    # creating logging file
     logging.basicConfig(filename = os.path.join(output_model_folder, "train.log"), filemode = 'w', level = logging.INFO)
     logging.getLogger().addHandler(logging.StreamHandler())
 
@@ -66,7 +66,7 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
     # set the input variables.
     input_var = ct.input((1, model.input_height, model.input_width), np.float32)
     label_var = ct.input((num_classes), np.float32)
-    
+
     # read FER+ dataset.
     logging.info("Loading data...")
     train_params        = FERPlusParameters(num_classes, model.input_height, model.input_width, training_mode, False)
@@ -75,14 +75,14 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
     train_data_reader   = FERPlusReader.create(base_folder, train_folders, "label.csv", train_params)
     val_data_reader     = FERPlusReader.create(base_folder, valid_folders, "label.csv", test_and_val_params)
     test_data_reader    = FERPlusReader.create(base_folder, test_folders, "label.csv", test_and_val_params)
-    
+
     # print summary of the data.
     display_summary(train_data_reader, val_data_reader, test_data_reader)
-    
+
     # get the probalistic output of the model.
     z    = model.model(input_var)
     pred = ct.softmax(z)
-    
+
     epoch_size     = train_data_reader.size()
     minibatch_size = 32
 
@@ -108,12 +108,12 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
     logging.info("Start training...")
     epoch      = 0
     best_epoch = 0
-    while epoch < max_epochs: 
+    while epoch < max_epochs:
         train_data_reader.reset()
         val_data_reader.reset()
         test_data_reader.reset()
-        
-        # Training 
+
+        # Training
         start_time = time.time()
         training_loss = 0
         training_accuracy = 0
@@ -126,19 +126,19 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
             # keep track of statistics.
             training_loss     += trainer.previous_minibatch_loss_average * current_batch_size
             training_accuracy += trainer.previous_minibatch_evaluation_average * current_batch_size
-                
+
         training_accuracy /= train_data_reader.size()
         training_accuracy = 1.0 - training_accuracy
-        
+
         # Validation
         val_accuracy = 0
         while val_data_reader.has_more():
             images, labels, current_batch_size = val_data_reader.next_minibatch(minibatch_size)
             val_accuracy += trainer.test_minibatch({input_var : images, label_var : labels}) * current_batch_size
-            
+
         val_accuracy /= val_data_reader.size()
         val_accuracy = 1.0 - val_accuracy
-        
+
         # if validation accuracy goes higher, we compute test accuracy
         test_run = False
         if val_accuracy > max_val_accuracy:
@@ -152,36 +152,37 @@ def main(base_folder, training_mode='majority', model_name='VGG13', max_epochs =
             while test_data_reader.has_more():
                 images, labels, current_batch_size = test_data_reader.next_minibatch(minibatch_size)
                 test_accuracy += trainer.test_minibatch({input_var : images, label_var : labels}) * current_batch_size
-            
+
             test_accuracy /= test_data_reader.size()
             test_accuracy = 1.0 - test_accuracy
             final_test_accuracy = test_accuracy
-            if final_test_accuracy > best_test_accuracy: 
+            if final_test_accuracy > best_test_accuracy:
                 best_test_accuracy = final_test_accuracy
- 
+
         logging.info("Epoch {}: took {:.3f}s".format(epoch, time.time() - start_time))
         logging.info("  training loss:\t{:e}".format(training_loss))
         logging.info("  training accuracy:\t\t{:.2f} %".format(training_accuracy * 100))
         logging.info("  validation accuracy:\t\t{:.2f} %".format(val_accuracy * 100))
         if test_run:
             logging.info("  test accuracy:\t\t{:.2f} %".format(test_accuracy * 100))
-            
+
         epoch += 1
 
     logging.info("")
     logging.info("Best validation accuracy:\t\t{:.2f} %, epoch {}".format(max_val_accuracy * 100, best_epoch))
     logging.info("Test accuracy corresponding to best validation:\t\t{:.2f} %".format(final_test_accuracy * 100))
     logging.info("Best test accuracy:\t\t{:.2f} %".format(best_test_accuracy * 100))
-    
+    trainer.model.save(os.path.join(base_folder, "model.cntk"))
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", 
-                        "--base_folder", 
-                        type = str, 
-                        help = "Base folder containing the training, validation and testing data.", 
+    parser.add_argument("-d",
+                        "--base_folder",
+                        type = str,
+                        help = "Base folder containing the training, validation and testing data.",
                         required = True)
-    parser.add_argument("-m", 
-                        "--training_mode", 
+    parser.add_argument("-m",
+                        "--training_mode",
                         type = str,
                         default='majority',
                         help = "Specify the training mode: majority, probability, crossentropy or multi_target.")
